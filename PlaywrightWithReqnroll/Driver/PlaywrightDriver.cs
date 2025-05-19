@@ -7,10 +7,10 @@ namespace PlaywrightWithReqnroll.Driver;
 /// </summary>
 public class PlaywrightDriver : IPlaywrightDriver
 {
-    private readonly IPlaywrightBrowserManager _playwrightDriverInitializer;
-    private readonly AsyncLazy<IBrowser> _browser;
-    private readonly AsyncLazy<IBrowserContext> _browserContext;
-    private readonly AsyncLazy<IPage> _page;
+    private readonly IPlaywrightBrowserManager _playwrightBrowserManager;
+    private readonly LazyAsync<IBrowser> _browser;
+    private readonly LazyAsync<IBrowserContext> _browserContext;
+    private readonly LazyAsync<IPage> _page;
     private bool _isDisposed;
 
     /// <summary>
@@ -20,17 +20,12 @@ public class PlaywrightDriver : IPlaywrightDriver
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="playwrightBrowserManager"/> is null.</exception>
     public PlaywrightDriver(IPlaywrightBrowserManager playwrightBrowserManager)
     {
-        _playwrightDriverInitializer = playwrightBrowserManager
+        _playwrightBrowserManager = playwrightBrowserManager
             ?? throw new ArgumentNullException(nameof(playwrightBrowserManager));
-        _browser = new AsyncLazy<IBrowser>(InitializePlaywrightAsync);
-        _browserContext = new AsyncLazy<IBrowserContext>(CreateBrowserContext);
-        _page = new AsyncLazy<IPage>(CreatePageAsync);
+        _browser = new LazyAsync<IBrowser>(CreateBrowser);
+        _browserContext = new LazyAsync<IBrowserContext>(CreateBrowserContext);
+        _page = new LazyAsync<IPage>(CreatePageAsync);
     }
-
-    /// <summary>
-    /// Gets the Playwright page instance, lazily initialized.
-    /// </summary>
-    public Task<IPage> Page => _page.Value;
 
     /// <summary>
     /// Gets the Playwright browser instance, lazily initialized.
@@ -43,31 +38,30 @@ public class PlaywrightDriver : IPlaywrightDriver
     public Task<IBrowserContext> BrowserContext => _browserContext.Value;
 
     /// <summary>
+    /// Gets the Playwright page instance, lazily initialized.
+    /// </summary>
+    public Task<IPage> Page => _page.Value;
+
+    /// <summary>
     /// Initializes the Playwright browser asynchronously.
     /// </summary>
     /// <returns>A task that represents the asynchronous operation. The task result contains the initialized <see cref="IBrowser"/> instance.</returns>
-    private async Task<IBrowser> InitializePlaywrightAsync()
-    {
-        return await _playwrightDriverInitializer.GetBrowserAsync();
-    }
+    private async Task<IBrowser> CreateBrowser()
+        => await _playwrightBrowserManager.GetBrowserAsync();
 
     /// <summary>
     /// Creates a new browser context asynchronously.
     /// </summary>
     /// <returns>A task that represents the asynchronous operation. The task result contains the created <see cref="IBrowserContext"/> instance.</returns>
     private async Task<IBrowserContext> CreateBrowserContext()
-    {
-        return await (await _browser).NewContextAsync();
-    }
+        => await (await _browser).NewContextAsync();
 
     /// <summary>
     /// Creates a new page within the browser context asynchronously.
     /// </summary>
     /// <returns>A task that represents the asynchronous operation. The task result contains the created <see cref="IPage"/> instance.</returns>
     private async Task<IPage> CreatePageAsync()
-    {
-        return await (await _browserContext).NewPageAsync();
-    }
+        => await (await _browserContext).NewPageAsync();
 
     /// <summary>
     /// Disposes of the Playwright browser instance and releases resources.

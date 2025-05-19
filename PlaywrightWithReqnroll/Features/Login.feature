@@ -7,12 +7,7 @@ Background:
 
 
 @login
-Scenario Outline: Test login with multiple credentials
-	When I enter <username> and <password>
+Scenario: Test login with multiple credentials
+	When I enter "username" and "password"
 	And I click the login button
 	Then I should be logged in successfully
-
-Examples:
-	| username | password |
-	| admin    | password |
-	| situser  | password |

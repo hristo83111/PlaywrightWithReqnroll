@@ -43,7 +43,7 @@ public class PlaywrightBrowserManager : IPlaywrightBrowserManager
         {
             Args = (Environment.GetEnvironmentVariable("Args") ?? "").Split(' ', StringSplitOptions.RemoveEmptyEntries),
             Timeout = float.TryParse(Environment.GetEnvironmentVariable("Timeout"), out var timeout) ? timeout * 1000 : 30000,
-            Headless = !Environment.GetEnvironmentVariable("Headless")?.Equals("false", StringComparison.OrdinalIgnoreCase) ?? true,
+            Headless = !Environment.GetEnvironmentVariable("Headless")?.Equals("false", StringComparison.OrdinalIgnoreCase) ?? false,
             SlowMo = float.TryParse(Environment.GetEnvironmentVariable("SlowMo"), out var slowMo) ? slowMo : 0
         };
     }

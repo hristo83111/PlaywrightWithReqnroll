@@ -7,15 +7,15 @@ namespace PlaywrightWithReqnroll.Driver;
 /// The value is initialized only once and is accessed asynchronously.
 /// </summary>
 /// <typeparam name="T">The type of the value to be lazily initialized.</typeparam>
-public class AsyncLazy<T>
+public class LazyAsync<T>
 {
     private readonly Lazy<Task<T>> _instance;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="AsyncLazy{T}"/> class with the specified asynchronous factory method.
+    /// Initializes a new instance of the <see cref="LazyAsync{T}"/> class with the specified asynchronous factory method.
     /// </summary>
     /// <param name="taskFactory">A factory method that returns a task to initialize the value.</param>
-    public AsyncLazy(Func<Task<T>> taskFactory)
+    public LazyAsync(Func<Task<T>> taskFactory)
     {
         _instance = new Lazy<Task<T>>(() => Task.Run(taskFactory));
     }

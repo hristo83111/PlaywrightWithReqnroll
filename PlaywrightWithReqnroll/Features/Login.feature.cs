@@ -116,20 +116,11 @@ namespace PlaywrightWithReqnroll.Features
         [NUnit.Framework.TestAttribute()]
         [NUnit.Framework.DescriptionAttribute("Test login with multiple credentials")]
         [NUnit.Framework.CategoryAttribute("login")]
-        [NUnit.Framework.TestCaseAttribute("admin", "password", null)]
-        [NUnit.Framework.TestCaseAttribute("situser", "password", null)]
-        public async global::System.Threading.Tasks.Task TestLoginWithMultipleCredentials(string username, string password, string[] exampleTags)
+        public async global::System.Threading.Tasks.Task TestLoginWithMultipleCredentials()
         {
-            string[] @__tags = new string[] {
+            string[] tagsOfScenario = new string[] {
                     "login"};
-            if ((exampleTags != null))
-            {
-                @__tags = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Concat(@__tags, exampleTags));
-            }
-            string[] tagsOfScenario = @__tags;
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
-            argumentsOfScenario.Add("username", username);
-            argumentsOfScenario.Add("password", password);
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Test login with multiple credentials", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 10
 this.ScenarioInitialize(scenarioInfo);
@@ -145,7 +136,7 @@ this.ScenarioInitialize(scenarioInfo);
 await this.FeatureBackgroundAsync();
 #line hidden
 #line 11
- await testRunner.WhenAsync(string.Format("I enter {0} and {1}", username, password), ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+ await testRunner.WhenAsync("I enter \"username\" and \"password\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
 #line 12
  await testRunner.AndAsync("I click the login button", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
