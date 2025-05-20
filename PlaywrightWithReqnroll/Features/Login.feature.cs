@@ -21,13 +21,15 @@ namespace PlaywrightWithReqnroll.Features
     [NUnit.Framework.DescriptionAttribute("Login")]
     [NUnit.Framework.FixtureLifeCycleAttribute(NUnit.Framework.LifeCycle.InstancePerTestCase)]
     [NUnit.Framework.CategoryAttribute("regression")]
+    [NUnit.Framework.CategoryAttribute("ui")]
     public partial class LoginFeature
     {
         
         private global::Reqnroll.ITestRunner testRunner;
         
         private static string[] featureTags = new string[] {
-                "regression"};
+                "regression",
+                "ui"};
         
         private static global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new global::System.Globalization.CultureInfo("en-US"), "Features", "Login", "\tTestting the login feature of application", global::Reqnroll.ProgrammingLanguage.CSharp, featureTags);
         
@@ -109,19 +111,19 @@ namespace PlaywrightWithReqnroll.Features
 #line 5
 #line hidden
 #line 6
- await testRunner.GivenAsync("I navigate to the conduit.bondaracademy.com", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
+ await testRunner.GivenAsync("I navigate to the saucedemo.com", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
         }
         
         [NUnit.Framework.TestAttribute()]
-        [NUnit.Framework.DescriptionAttribute("Test login with multiple credentials")]
+        [NUnit.Framework.DescriptionAttribute("Test login with valid credentials")]
         [NUnit.Framework.CategoryAttribute("login")]
-        public async global::System.Threading.Tasks.Task TestLoginWithMultipleCredentials()
+        public async global::System.Threading.Tasks.Task TestLoginWithValidCredentials()
         {
             string[] tagsOfScenario = new string[] {
                     "login"};
             global::System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary();
-            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Test login with multiple credentials", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Test login with valid credentials", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 10
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -135,14 +137,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 5
 await this.FeatureBackgroundAsync();
 #line hidden
+                global::Reqnroll.Table table1 = new global::Reqnroll.Table(new string[] {
+                            "username",
+                            "password"});
+                table1.AddRow(new string[] {
+                            "standard_user",
+                            "secret_sauce"});
 #line 11
- await testRunner.WhenAsync("I enter \"username\" and \"password\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
+    await testRunner.WhenAsync("I login with credentials:", ((string)(null)), table1, "When ");
 #line hidden
-#line 12
- await testRunner.AndAsync("I click the login button", ((string)(null)), ((global::Reqnroll.Table)(null)), "And ");
-#line hidden
-#line 13
- await testRunner.ThenAsync("I should be logged in successfully", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
+#line 14
+    await testRunner.ThenAsync("I should be logged in successfully", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
             await this.ScenarioCleanupAsync();

@@ -17,7 +17,7 @@ public class LazyAsync<T>
     /// <param name="taskFactory">A factory method that returns a task to initialize the value.</param>
     public LazyAsync(Func<Task<T>> taskFactory)
     {
-        _instance = new Lazy<Task<T>>(() => Task.Run(taskFactory));
+        _instance = new Lazy<Task<T>>(taskFactory);
     }
 
     /// <summary>

@@ -8,33 +8,43 @@ namespace PlaywrightWithReqnroll.RestClient;
 /// </summary>
 public class RestClientFactory : IRestClientFactory
 {
-    private readonly LazyAsync<IPlaywright> _playwright;
-    private bool _isDisposed;
+    // Use your LazyAsync<T> for singleton async initialization
+    private static readonly LazyAsync<IPlaywright> _playwright = new(() => Playwright.CreateAsync());
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RestClientFactory"/> class.
+    /// Creates a <see cref="FluentRestClient"/> configured with a JWT Bearer token for authentication.
     /// </summary>
-    public RestClientFactory()
-    {
-        _playwright = new LazyAsync<IPlaywright>(CreatePlaywrightAsync);
-    }
+    /// <param name="baseUrl">The base URL for the API requests.</param>
+    /// <param name="bearerToken">The JWT Bearer token to use for authentication.</param>
+    /// <returns>A <see cref="FluentRestClient"/> instance with JWT authentication.</returns>
+    public Task<FluentRestClient> CreateClientWithJWTTokenAsync(string baseUrl, string bearerToken) =>
+        CreateClientAsync(baseUrl, extraHeaders: new Dictionary<string, string> { { "Authorization", $"Bearer {bearerToken}" } });
 
-    /// <inheritdoc />
-    public Task<FluentRestClient> CreateClientWithJWTToken(string baseUrl, string bearerToken) =>
-        CreateClient(baseUrl, extraHeaders: new Dictionary<string, string> { { "Authorization", $"Bearer {bearerToken}" } });
+    /// <summary>
+    /// Creates a <see cref="FluentRestClient"/> configured with basic authentication credentials.
+    /// </summary>
+    /// <param name="baseUrl">The base URL for the API requests.</param>
+    /// <param name="credentials">The HTTP credentials for basic authentication.</param>
+    /// <returns>A <see cref="FluentRestClient"/> instance with basic authentication.</returns>
+    public Task<FluentRestClient> CreateClientWithBasicAuthenticationAsync(string baseUrl, HttpCredentials credentials) =>
+        CreateClientAsync(baseUrl, credentials: credentials);
 
-    /// <inheritdoc />
-    public Task<FluentRestClient> CreateClientWithBasicAuthentication(string baseUrl, HttpCredentials credentials) =>
-        CreateClient(baseUrl, credentials: credentials);
-
-    /// <inheritdoc />
-    public Task<FluentRestClient> CreateUnauthenticatedClient(string baseUrl) =>
-        CreateClient(baseUrl);
+    /// <summary>
+    /// Creates a <see cref="FluentRestClient"/> without any authentication.
+    /// </summary>
+    /// <param name="baseUrl">The base URL for the API requests.</param>
+    /// <returns>A <see cref="FluentRestClient"/> instance without authentication.</returns>
+    public Task<FluentRestClient> CreateUnauthenticatedClientAsync(string baseUrl) =>
+        CreateClientAsync(baseUrl);
 
     /// <summary>
     /// Internal helper to create a <see cref="FluentRestClient"/> with optional headers and credentials.
     /// </summary>
-    private async Task<FluentRestClient> CreateClient(
+    /// <param name="baseUrl">The base URL for the API requests.</param>
+    /// <param name="extraHeaders">Optional extra HTTP headers.</param>
+    /// <param name="credentials">Optional HTTP credentials for authentication.</param>
+    /// <returns>A <see cref="FluentRestClient"/> instance.</returns>
+    private async Task<FluentRestClient> CreateClientAsync(
         string baseUrl,
         Dictionary<string, string>? extraHeaders = null,
         HttpCredentials? credentials = null)
@@ -49,29 +59,5 @@ public class RestClientFactory : IRestClientFactory
         };
         var context = await playwright.APIRequest.NewContextAsync(options);
         return new FluentRestClient(context);
-    }
-
-    /// <summary>
-    /// Creates the Playwright instance asynchronously.
-    /// </summary>
-    private static Task<IPlaywright> CreatePlaywrightAsync() => Playwright.CreateAsync();
-
-    /// <summary>
-    /// Disposes of the Playwright instance and releases resources.
-    /// </summary>
-    public void Dispose()
-    {
-        if (_isDisposed) return;
-
-        if (_playwright.IsValueCreated)
-        {
-            Task.Run(async () =>
-            {
-                var playwright = await _playwright;
-                playwright.Dispose();
-            });
-        }
-
-        _isDisposed = true;
     }
 }

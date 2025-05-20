@@ -5,11 +5,12 @@ namespace PlaywrightWithReqnroll.RestClient;
 /// <summary>
 /// Provides a fluent interface for building and executing HTTP requests using Playwright's <see cref="IAPIRequestContext"/>.
 /// </summary>
-public class FluentRestClient(IAPIRequestContext context) : IFluentRestClient
+public class FluentRestClient(IAPIRequestContext context) : IFluentRestClient, IDisposable, IAsyncDisposable
 {
     private readonly IAPIRequestContext _context = context;
     private string _url = string.Empty;
     private readonly APIRequestContextOptions _options = new() { Timeout = 90000 };
+    private bool _isDisposed;
 
     /// <summary>
     /// Sets the URL for the HTTP request.
@@ -91,4 +92,25 @@ public class FluentRestClient(IAPIRequestContext context) : IFluentRestClient
     /// </summary>
     /// <returns>A task that represents the asynchronous operation. The task result contains the API response.</returns>
     public async Task<IAPIResponse> ExecuteDeleteAsync() => await _context.DeleteAsync(_url, _options);
+
+    /// <summary>
+    /// Asynchronously disposes the underlying <see cref="IAPIRequestContext"/> and releases any associated resources.
+    /// </summary>
+    /// <returns>A <see cref="ValueTask"/> that represents the asynchronous dispose operation.</returns>
+    public async ValueTask DisposeAsync()
+    {
+        if (_isDisposed) return;
+
+        await _context.DisposeAsync();
+        _isDisposed = true;
+    }
+
+    /// <summary>
+    /// Synchronously disposes the Playwright driver and releases all associated resources.
+    /// This method blocks until the asynchronous disposal operation is complete by calling <see cref="DisposeAsync"/>.
+    /// </summary>
+    public void Dispose()
+    {
+        DisposeAsync().GetAwaiter().GetResult();
+    }
 }

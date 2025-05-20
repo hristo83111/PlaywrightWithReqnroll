@@ -5,7 +5,7 @@ namespace PlaywrightWithReqnroll.Driver;
 /// <summary>
 /// Provides a driver for managing Playwright browser instances, contexts, and pages.
 /// </summary>
-public class PlaywrightDriver : IPlaywrightDriver
+public class PlaywrightDriver : IPlaywrightDriver, IDisposable, IAsyncDisposable
 {
     private readonly IPlaywrightBrowserManager _playwrightBrowserManager;
     private readonly LazyAsync<IBrowser> _browser;
@@ -22,8 +22,8 @@ public class PlaywrightDriver : IPlaywrightDriver
     {
         _playwrightBrowserManager = playwrightBrowserManager
             ?? throw new ArgumentNullException(nameof(playwrightBrowserManager));
-        _browser = new LazyAsync<IBrowser>(CreateBrowser);
-        _browserContext = new LazyAsync<IBrowserContext>(CreateBrowserContext);
+        _browser = new LazyAsync<IBrowser>(CreateBrowserAsync);
+        _browserContext = new LazyAsync<IBrowserContext>(CreateBrowserContextAsync);
         _page = new LazyAsync<IPage>(CreatePageAsync);
     }
 
@@ -43,17 +43,43 @@ public class PlaywrightDriver : IPlaywrightDriver
     public Task<IPage> Page => _page.Value;
 
     /// <summary>
+    /// Disposes of the Playwright browser instance and releases resources.
+    /// </summary>
+    public async ValueTask DisposeAsync()
+    {
+        if (_isDisposed) return;
+
+        if (_browser.IsValueCreated)
+        {
+            var browser = await Browser;
+            await browser.CloseAsync();
+            await browser.DisposeAsync();
+        }
+
+        _isDisposed = true;
+    }
+
+    /// <summary>
+    /// Synchronously disposes the Playwright driver and releases all associated resources.
+    /// This method blocks until the asynchronous disposal operation is complete by calling <see cref="DisposeAsync"/>.
+    /// </summary>
+    public void Dispose()
+    {
+        DisposeAsync().GetAwaiter().GetResult();
+    }
+
+    /// <summary>
     /// Initializes the Playwright browser asynchronously.
     /// </summary>
     /// <returns>A task that represents the asynchronous operation. The task result contains the initialized <see cref="IBrowser"/> instance.</returns>
-    private async Task<IBrowser> CreateBrowser()
+    private async Task<IBrowser> CreateBrowserAsync()
         => await _playwrightBrowserManager.GetBrowserAsync();
 
     /// <summary>
     /// Creates a new browser context asynchronously.
     /// </summary>
     /// <returns>A task that represents the asynchronous operation. The task result contains the created <see cref="IBrowserContext"/> instance.</returns>
-    private async Task<IBrowserContext> CreateBrowserContext()
+    private async Task<IBrowserContext> CreateBrowserContextAsync()
         => await (await _browser).NewContextAsync();
 
     /// <summary>
@@ -62,24 +88,5 @@ public class PlaywrightDriver : IPlaywrightDriver
     /// <returns>A task that represents the asynchronous operation. The task result contains the created <see cref="IPage"/> instance.</returns>
     private async Task<IPage> CreatePageAsync()
         => await (await _browserContext).NewPageAsync();
-
-    /// <summary>
-    /// Disposes of the Playwright browser instance and releases resources.
-    /// </summary>
-    public void Dispose()
-    {
-        if (_isDisposed) return;
-
-        if (_browser.IsValueCreated)
-        {
-            Task.Run(async () =>
-            {
-                await (await Browser).CloseAsync();
-                await (await Browser).DisposeAsync();
-            });
-        }
-
-        _isDisposed = true;
-    }
 }
 

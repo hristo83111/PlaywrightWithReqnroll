@@ -24,9 +24,4 @@ public interface IPlaywrightDriver
     /// </summary>
     /// <returns>A task that represents the asynchronous operation. The task result contains the <see cref="IPage"/> instance.</returns>
     Task<IPage> Page { get; }
-
-    /// <summary>
-    /// Disposes of the Playwright browser instance and releases resources.
-    /// </summary>
-    void Dispose();
 }

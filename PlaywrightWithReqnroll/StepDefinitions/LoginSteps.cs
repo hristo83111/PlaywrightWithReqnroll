@@ -1,36 +1,23 @@
-using Microsoft.Playwright;
-using PlaywrightWithReqnroll.Driver;
+using PlaywrightWithReqnroll.Configuration;
+using PlaywrightWithReqnroll.Models;
+using PlaywrightWithReqnroll.Pages;
 using Reqnroll;
 
-namespace PlaywrightWithReqnroll.StepDefinitions;
-
 [Binding]
-public class LoginSteps(IPlaywrightDriver playwrightDriver)
+public class LoginSteps(LoginPage loginPage, TestSettings testSettings)
 {
-    private readonly IPage _page = playwrightDriver.Page.Result;
+    private readonly LoginPage _loginPage = loginPage;
+    private readonly TestSettings _testSettings = testSettings;
 
-    [Given("I navigate to the conduit.bondaracademy.com")]
-    public async Task GivenINavigateToTheConduit_Bondaracademy_ComAsync()
+    [Given("I navigate to the saucedemo.com")]
+    public async Task GivenINavigateToTheSaucedemo_Com()
     {
-        await _page.GotoAsync("https://google.com");
+        await _loginPage.NavigateToUrlAsync(_testSettings.ApplicationBaseUrl);
     }
 
-    [When("I enter {string} and {string}")]
-    public void WhenIEnterAnd(string username, string password)
+    [When("I login with credentials:")]
+    public async Task WhenILoginWithCredentials(LoginCredentials loginCredentials)
     {
-        throw new PendingStepException();
-    }
-
-    [When("I click the login button")]
-    public void WhenIClickTheLoginButton()
-    {
-        throw new PendingStepException();
-    }
-
-    [Then("I should be logged in successfully")]
-    public void ThenIShouldBeLoggedInSuccessfully()
-    {
-        throw new PendingStepException();
+        await _loginPage.LoginAsync(loginCredentials);
     }
 }
-
