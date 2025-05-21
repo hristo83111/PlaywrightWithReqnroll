@@ -4,8 +4,9 @@ using PlaywrightWithReqnroll.Pages;
 using Reqnroll;
 
 [Binding]
-public class LoginSteps(LoginPage loginPage, TestSettings testSettings)
+public class LoginSteps(ScenarioDataContext scenarioDataContext, LoginPage loginPage, TestSettings testSettings)
 {
+    private readonly ScenarioDataContext _scenarioDataContext = scenarioDataContext;
     private readonly LoginPage _loginPage = loginPage;
     private readonly TestSettings _testSettings = testSettings;
 
@@ -18,6 +19,7 @@ public class LoginSteps(LoginPage loginPage, TestSettings testSettings)
     [When("I login with credentials:")]
     public async Task WhenILoginWithCredentials(LoginCredentials loginCredentials)
     {
+        _scenarioDataContext.LoginCredentials = loginCredentials;
         await _loginPage.LoginAsync(loginCredentials);
     }
 }

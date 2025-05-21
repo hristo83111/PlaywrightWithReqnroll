@@ -1,12 +1,15 @@
 ﻿using Microsoft.Playwright;
+using PlaywrightWithReqnroll.Configuration;
 
 namespace PlaywrightWithReqnroll.Driver;
 
 /// <summary>
 /// Manages the initialization and configuration of browser instances using Playwright.
 /// </summary>
-public class PlaywrightBrowserManager : IPlaywrightBrowserManager
+public class PlaywrightBrowserManager(TestSettings testSettings) : IPlaywrightBrowserManager
 {
+    private readonly TestSettings _testSettings = testSettings;
+
     /// <summary>
     /// Retrieves a browser instance based on the specified browser type.
     /// </summary>
@@ -14,8 +17,6 @@ public class PlaywrightBrowserManager : IPlaywrightBrowserManager
     public async Task<IBrowser> GetBrowserAsync()
     {
         var options = GetParameters();
-
-        options.Channel = GetChannelForBrowser();
 
         return await LaunchBrowserAsync(options);
     }
@@ -28,9 +29,9 @@ public class PlaywrightBrowserManager : IPlaywrightBrowserManager
     private async Task<IBrowser> LaunchBrowserAsync(BrowserTypeLaunchOptions options)
     {
         var playwright = await Playwright.CreateAsync();
-        var browserType = GetBrowserType(playwright);
+        var bowserType = GetBrowserType(playwright);
 
-        return await browserType.LaunchAsync(options);
+        return await bowserType.LaunchAsync(options);
     }
 
     /// <summary>
@@ -41,26 +42,8 @@ public class PlaywrightBrowserManager : IPlaywrightBrowserManager
     {
         return new BrowserTypeLaunchOptions
         {
-            Args = (Environment.GetEnvironmentVariable("Args") ?? "").Split(' ', StringSplitOptions.RemoveEmptyEntries),
-            Timeout = float.TryParse(Environment.GetEnvironmentVariable("Timeout"), out var timeout) ? timeout * 1000 : 30000,
-            Headless = !Environment.GetEnvironmentVariable("Headless")?.Equals("false", StringComparison.OrdinalIgnoreCase) ?? false,
-            SlowMo = float.TryParse(Environment.GetEnvironmentVariable("SlowMo"), out var slowMo) ? slowMo : 0
-        };
-    }
-
-    /// <summary>
-    /// Determines the appropriate channel for the specified browser.
-    /// </summary>
-    /// <returns>The channel name, or null if no channel is required.</returns>
-    private string? GetChannelForBrowser()
-    {
-        var browser = Environment.GetEnvironmentVariable("Browser") ?? "Chromium";
-        return browser switch
-        {
-            "Chromium" => "chromium",
-            "Chrome" => "chrome",
-            "Edge" => "msedge",
-            _ => null // No channel required for Firefox and Webkit
+            Headless = _testSettings.Playwright.LaunchOptions.Headless,
+            Channel = _testSettings.Playwright.LaunchOptions.Channel,
         };
     }
 
@@ -71,13 +54,14 @@ public class PlaywrightBrowserManager : IPlaywrightBrowserManager
     /// <returns>The browser type.</returns>
     private IBrowserType GetBrowserType(IPlaywright playwright)
     {
-        var browser = Environment.GetEnvironmentVariable("Browser") ?? "Chromium";
-        return browser switch
+        var browserName = _testSettings.Playwright.BrowserName;
+
+        return browserName switch
         {
-            "Chromium" or "Chrome" or "Edge" => playwright.Chromium,
-            "Firefox" => playwright.Firefox,
-            "Webkit" => playwright.Webkit,
-            _ => throw new ArgumentOutOfRangeException(nameof(browser), $"Unsupported browser type: {browser}")
+            "chromium" => playwright.Chromium,
+            "firefox" => playwright.Firefox,
+            "webkit" => playwright.Webkit,
+            _ => throw new ArgumentOutOfRangeException(nameof(browserName), $"Unsupported browser type: {browserName}")
         };
     }
 }

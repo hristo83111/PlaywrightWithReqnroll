@@ -8,7 +8,5 @@ public class StepTransformation
 {
     [StepArgumentTransformation]
     public LoginCredentials LoginCredentialsTransformation(DataTable dataTable)
-    {
-        return dataTable.CreateInstance<LoginCredentials>();
-    }
+        => dataTable.CreateInstance<LoginCredentials>();
 }
