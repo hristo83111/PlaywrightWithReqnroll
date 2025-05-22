@@ -21,20 +21,11 @@ public class SetupTestDependencies
     {
         var services = new ServiceCollection();
 
-        /// <summary>
-        /// Helper method to retrieve the <see cref="IPlaywrightDriver"/> from the service provider.
-        /// </summary>
-        IPlaywrightDriver GetDriver(IServiceProvider provider) =>
-            provider.GetRequiredService<IPlaywrightDriver>();
-
         services
             .AddSingleton<IRestClientFactory, RestClientFactory>()
             .AddSingleton<TestSettings>(_ => ConfigurationLoader.Load())
             .AddScoped<IPlaywrightBrowserManager, PlaywrightBrowserManager>()
             .AddScoped<IPlaywrightDriver, PlaywrightDriver>()
-            .AddScoped<IBrowser>(provider => GetDriver(provider).Browser.Result)
-            .AddScoped<IBrowserContext>(provider => GetDriver(provider).BrowserContext.Result)
-            .AddScoped<IPage>(provider => GetDriver(provider).Page.Result)
             .AddScoped<ScenarioDataContext>()
             .AddScoped<LoginPage>()
             .AddScoped<InventoryPage>();

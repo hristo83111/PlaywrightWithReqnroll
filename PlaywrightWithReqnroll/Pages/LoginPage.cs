@@ -1,4 +1,4 @@
-﻿using Microsoft.Playwright;
+﻿using PlaywrightWithReqnroll.Driver;
 using PlaywrightWithReqnroll.Models;
 
 namespace PlaywrightWithReqnroll.Pages;
@@ -6,14 +6,8 @@ namespace PlaywrightWithReqnroll.Pages;
 /// <summary>
 /// Represents the login page and provides methods to perform login actions using Playwright.
 /// </summary>
-public class LoginPage(IPage page)
+public class LoginPage(IPlaywrightDriver playwrightDriver)
 {
-    private readonly IPage _page = page;
-
-    private ILocator UsernameInput => _page.GetByPlaceholder("Username");
-    private ILocator PasswordInput => _page.GetByPlaceholder("Password");
-    private ILocator LoginButton => _page.Locator("#login-button");
-
     /// <summary>
     /// Navigates the browser page to the specified URL.
     /// </summary>
@@ -21,7 +15,8 @@ public class LoginPage(IPage page)
     /// <returns>A task that represents the asynchronous navigation operation.</returns>
     public async Task NavigateToUrlAsync(string url)
     {
-        await _page.GotoAsync(url);
+        var page = await playwrightDriver.Page;
+        await page.GotoAsync(url);
     }
 
     /// <summary>
@@ -31,8 +26,13 @@ public class LoginPage(IPage page)
     /// <returns>A task that represents the asynchronous login operation.</returns>
     public async Task LoginAsync(LoginCredentials loginCredentials)
     {
-        await UsernameInput.FillAsync(loginCredentials.Username);
-        await PasswordInput.FillAsync(loginCredentials.Password);
-        await LoginButton.ClickAsync();
+        var page = await playwrightDriver.Page;
+        var usernameInput = page.GetByPlaceholder("Username");
+        var passwordInput = page.GetByPlaceholder("Password");
+        var loginButton = page.Locator("#login-button");
+
+        await usernameInput.FillAsync(loginCredentials.Username);
+        await passwordInput.FillAsync(loginCredentials.Password);
+        await loginButton.ClickAsync();
     }
 }

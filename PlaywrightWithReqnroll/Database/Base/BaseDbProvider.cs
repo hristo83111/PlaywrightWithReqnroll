@@ -7,7 +7,6 @@ namespace PlaywrightWithReqnroll.Database.Providers;
 /// </summary>
 public abstract class BaseDbProvider(string connectionString) : IDisposable
 {
-    private readonly string _connectionString = connectionString;
     private NpgsqlConnection? _connection;
 
     /// <summary>
@@ -20,7 +19,7 @@ public abstract class BaseDbProvider(string connectionString) : IDisposable
         {
             if (_connection == null)
             {
-                _connection = new NpgsqlConnection(_connectionString);
+                _connection = new NpgsqlConnection(connectionString);
                 _connection.Open();
             }
             return _connection;

@@ -7,7 +7,6 @@ namespace PlaywrightWithReqnroll.RestClient;
 /// </summary>
 public class FluentRestClient(IAPIRequestContext context) : IFluentRestClient, IDisposable, IAsyncDisposable
 {
-    private readonly IAPIRequestContext _context = context;
     private string _url = string.Empty;
     private readonly APIRequestContextOptions _options = new() { Timeout = 90000 };
     private bool _isDisposed;
@@ -67,31 +66,31 @@ public class FluentRestClient(IAPIRequestContext context) : IFluentRestClient, I
     /// Executes an HTTP GET request with the configured parameters.
     /// </summary>
     /// <returns>A task that represents the asynchronous operation. The task result contains the API response.</returns>
-    public async Task<IAPIResponse> ExecuteGetAsync() => await _context.GetAsync(_url, _options);
+    public async Task<IAPIResponse> ExecuteGetAsync() => await context.GetAsync(_url, _options);
 
     /// <summary>
     /// Executes an HTTP POST request with the configured parameters and body.
     /// </summary>
     /// <returns>A task that represents the asynchronous operation. The task result contains the API response.</returns>
-    public async Task<IAPIResponse> ExecutePostAsync() => await _context.PostAsync(_url, _options);
+    public async Task<IAPIResponse> ExecutePostAsync() => await context.PostAsync(_url, _options);
 
     /// <summary>
     /// Executes an HTTP PUT request with the configured parameters and body.
     /// </summary>
     /// <returns>A task that represents the asynchronous operation. The task result contains the API response.</returns>
-    public async Task<IAPIResponse> ExecutePutAsync() => await _context.PutAsync(_url, _options);
+    public async Task<IAPIResponse> ExecutePutAsync() => await context.PutAsync(_url, _options);
 
     /// <summary>
     /// Executes an HTTP PATCH request with the configured parameters and body.
     /// </summary>
     /// <returns>A task that represents the asynchronous operation. The task result contains the API response.</returns>
-    public async Task<IAPIResponse> ExecutePatchAsync() => await _context.PatchAsync(_url, _options);
+    public async Task<IAPIResponse> ExecutePatchAsync() => await context.PatchAsync(_url, _options);
 
     /// <summary>
     /// Executes an HTTP DELETE request with the configured parameters.
     /// </summary>
     /// <returns>A task that represents the asynchronous operation. The task result contains the API response.</returns>
-    public async Task<IAPIResponse> ExecuteDeleteAsync() => await _context.DeleteAsync(_url, _options);
+    public async Task<IAPIResponse> ExecuteDeleteAsync() => await context.DeleteAsync(_url, _options);
 
     /// <summary>
     /// Asynchronously disposes the underlying <see cref="IAPIRequestContext"/> and releases any associated resources.
@@ -101,7 +100,7 @@ public class FluentRestClient(IAPIRequestContext context) : IFluentRestClient, I
     {
         if (_isDisposed) return;
 
-        await _context.DisposeAsync();
+        await context.DisposeAsync();
         _isDisposed = true;
     }
 

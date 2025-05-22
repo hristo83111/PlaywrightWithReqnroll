@@ -8,8 +8,6 @@ namespace PlaywrightWithReqnroll.Driver;
 /// </summary>
 public class PlaywrightBrowserManager(TestSettings testSettings) : IPlaywrightBrowserManager
 {
-    private readonly TestSettings _testSettings = testSettings;
-
     /// <summary>
     /// Retrieves a browser instance based on the specified browser type.
     /// </summary>
@@ -42,8 +40,8 @@ public class PlaywrightBrowserManager(TestSettings testSettings) : IPlaywrightBr
     {
         return new BrowserTypeLaunchOptions
         {
-            Headless = _testSettings.Playwright.LaunchOptions.Headless,
-            Channel = _testSettings.Playwright.LaunchOptions.Channel,
+            Headless = testSettings.Playwright.LaunchOptions.Headless,
+            Channel = testSettings.Playwright.LaunchOptions.Channel,
         };
     }
 
@@ -54,7 +52,7 @@ public class PlaywrightBrowserManager(TestSettings testSettings) : IPlaywrightBr
     /// <returns>The browser type.</returns>
     private IBrowserType GetBrowserType(IPlaywright playwright)
     {
-        var browserName = _testSettings.Playwright.BrowserName;
+        var browserName = testSettings.Playwright.BrowserName;
 
         return browserName switch
         {
